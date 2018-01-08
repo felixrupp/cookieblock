@@ -7,12 +7,13 @@
     <script src="dist/CookieBlock.min.js"></script>
     <script>
         window.cookieblock.setAppOption("respectDoNotTrack", true);
-        window.cookieblock.setModuleOptions("googleAnalytics", ['12345-6']);
+        //window.cookieblock.setModuleOptions("googleAnalytics", {propertyId: '12345-6'});
+        //window.cookieblock.setModuleOptions("piwik", {url: 'https://demo.piwik.org'});
 
         window.cookieblock.init();
 
-        window.cookieblock.enableModule("googleAnalytics");
-        window.cookieblock.enableModule("piwik");
+        window.cookieblock.enableModule("googleAnalytics", {propertyId: '12345-6'});
+        window.cookieblock.enableModule("piwik", {url: 'https://demo.piwik.org'});
 
         console.log("Final Cookie Values:");
         console.log(window.cookieblock.getCookieBlockCookie());

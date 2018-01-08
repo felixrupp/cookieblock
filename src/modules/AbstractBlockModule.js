@@ -11,13 +11,16 @@
  */
 export default class AbstractBlockModule {
 
-    constructor(options = []) {
+    constructor(options = {}) {
         this.classOptions = options;
+        this.currentBrowserLanguage = navigator.language || navigator.userLanguage;
     }
 
-    block() {}
+    block() {
+    }
 
-    unblock() {}
+    unblock() {
+    }
 
     /**
      * Set Class Options

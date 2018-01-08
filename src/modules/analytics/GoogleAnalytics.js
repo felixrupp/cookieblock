@@ -13,11 +13,11 @@ import AbstractBlockModule from "../AbstractBlockModule";
  */
 export default class GoogleAnalytics extends AbstractBlockModule {
 
-    constructor(options = []) {
+    constructor(options = {}) {
 
         super(options);
 
-        console.log("GA Module:");
+        console.log("GA Module initialized.");
         //this.classOptions = options;
     }
 
@@ -26,10 +26,10 @@ export default class GoogleAnalytics extends AbstractBlockModule {
         console.log("Attempt to Block Google Analytics with Options:");
         console.log(this.classOptions);
 
-        if(this.classOptions instanceof Array && this.classOptions.length > 0) {
+        if (this.classOptions instanceof Object && this.classOptions.propertyId !== undefined) {
 
             console.log("Blocking Google Analytics");
-            window['ga-disable-UA-'+this.classOptions[0]] = true;
+            window['ga-disable-UA-' + this.classOptions.propertyId] = true;
         }
         else {
 
@@ -39,9 +39,9 @@ export default class GoogleAnalytics extends AbstractBlockModule {
 
     unblock() {
 
-        if(this.classOptions instanceof Array) {
+        if (this.classOptions instanceof Array && this.classOptions.propertyId !== undefined) {
             console.log("Unblocking Google Analytics");
-            window['ga-disable-UA-'+this.classOptions[0]] = false;
+            window['ga-disable-UA-' + this.classOptions.propertyId] = false;
         }
         else {
 

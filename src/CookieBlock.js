@@ -30,12 +30,12 @@ export default class CookieBlock {
         ]);
 
         this.pluginOptions = new Map([
-            ["googleAnalytics", {active: false, options: []}],
-            ["piwik", {active: false, options: []}],
-            ["facebook", {active: false, options: []}],
-            ["twitter", {active: false, options: []}],
-            ["instagram", {active: false, options: []}],
-            ["pinterest", {active: false, options: []}]
+            ["googleAnalytics", {active: false, options: {propertyId: ''}}],
+            ["piwik", {active: false, options: {url: ''}}],
+            ["facebook", {active: false, options: {}}],
+            ["twitter", {active: false, options: {}}],
+            ["instagram", {active: false, options: {}}],
+            ["pinterest", {active: false, options: {}}]
         ]);
 
         this.pluginObjects = new Map([
@@ -81,15 +81,14 @@ export default class CookieBlock {
             console.log(this.pluginOptions);
 
             console.log("Manage DNT after Cookie:");
-            let dntActive = this.manageDoNotTrack();
-            console.log(dntActive);
+            /*let dntActive = */this.manageDoNotTrack();
+            //console.log(dntActive);
 
             console.log("Plugin Values after DNT Manage:");
             console.log(this.pluginOptions);
 
-            /*
             // Overwrite the pluginOptions with disabled values:
-            if (dntActive) {
+            /*if (dntActive) {
 
                 // Block all active modules initially
                 this.pluginOptions.forEach((options, moduleId) => {
@@ -167,47 +166,55 @@ export default class CookieBlock {
      */
     disableModule(moduleId) {
 
+        // Save options for cookie
         let moduleOptions = this.pluginOptions.get(moduleId);
-        let moduleObject = this.pluginObjects.get(moduleId);
-
         moduleOptions.active = false;
-
-        moduleObject.object.unblock();
         this.pluginOptions.set(moduleId, moduleOptions);
         this.setCookieBlockCookie(this.pluginOptions);
+
+        // Set the object settings and disable blocking
+        let moduleObject = this.pluginObjects.get(moduleId);
+        moduleObject.object.unblock();
     }
 
     /**
      * Disable one module
      *
      * @param moduleId
+     * @param classOptions
      */
-    enableModule(moduleId) {
+    enableModule(moduleId, classOptions = {}) {
 
+        // Save options for cookie
         let moduleOptions = this.pluginOptions.get(moduleId);
-        let moduleObject = this.pluginObjects.get(moduleId);
-
         moduleOptions.active = true;
-
-        moduleObject.object.block();
+        moduleOptions.options = classOptions;
         this.pluginOptions.set(moduleId, moduleOptions);
         this.setCookieBlockCookie(this.pluginOptions);
+
+        // Set the object settings and enable blocking
+        let moduleObject = this.pluginObjects.get(moduleId);
+        moduleObject.object.setClassOptions(classOptions);
+        moduleObject.object.block();
+        this.pluginObjects.set(moduleId, moduleObject);
     }
 
     /**
      * Set moduleOptions
      * @param moduleId
-     * @param options
+     * @param classOptions
      */
-    setModuleOptions(moduleId, options) {
+    setModuleOptions(moduleId, classOptions) {
 
-        let moduleObject = this.pluginObjects.get(moduleId);
-        moduleObject.object.setClassOptions(options);
-
+        // Save options for cookie
         let moduleOptions = this.pluginOptions.get(moduleId);
-        moduleOptions.options = options;
+        moduleOptions.options = classOptions;
         this.pluginOptions.set(moduleId, moduleOptions);
         this.setCookieBlockCookie(this.pluginOptions);
+
+        // Set the object settings
+        let moduleObject = this.pluginObjects.get(moduleId);
+        moduleObject.object.setClassOptions(classOptions);
     }
 
     /**
@@ -245,7 +252,7 @@ export default class CookieBlock {
             let ie9DNT = false;
             let ie10DNT = false;
 
-            if (window.navigator.doNotTrack !== undefined && window.navigator.doNotTrack !== null) {
+            if (window.navigator.doNotTrack) {
 
                 hasDNT = window.navigator.doNotTrack;
 
@@ -262,11 +269,27 @@ export default class CookieBlock {
 
             if (hasDNT || ie9DNT || ie10DNT) {
 
+                let alreadyActive = false;
+
                 // Activate all modules initially
                 this.pluginOptions.forEach((options, moduleId) => {
 
-                    options.active = true;
+                    if (options.active) alreadyActive = true;
                 });
+
+                if (!alreadyActive) {
+
+                    this.pluginOptions.forEach((options, moduleId) => {
+
+                        options.active = true;
+                    });
+                }
+
+                // also set a Content Security Policy meta tag to prevent the loading of external js sources
+                let meta = document.createElement('meta');
+                meta.httpEquiv = "Content-Security-Policy";
+                meta.content = "script-src 'self'";
+                document.getElementsByTagName('head')[0].insertBefore(meta, document.getElementsByTagName('head')[0].firstChild);
 
                 console.log("DNT is being respected and active.");
                 return true;
@@ -290,6 +313,24 @@ export default class CookieBlock {
     setAppOption(optionKey, optionValue) {
 
         this.appOptions.set(optionKey, optionValue);
+    }
+
+    /**
+     * Get app option
+     * @param optionKey
+     */
+    getAppOption(optionKey) {
+
+        return this.appOptions.get(optionKey);
+    }
+
+    /**
+     * Get all app options
+     * @returns {Map}
+     */
+    getAppOptions() {
+
+        return this.appOptions;
     }
 
     /**
