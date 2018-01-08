@@ -1,0 +1,24 @@
+{
+  "name": "cookieblock",
+  "authors": [
+    "Felix Rupp <kontakt@felixrupp.com>"
+  ],
+  "description": "Library to block tracking cookies, complying the eu cookie law. Combine with any cookie consent library you want.",
+  "main": "dist/CookieBlock.js",
+  "keywords": [
+    "eu",
+    "cookie",
+    "block",
+    "consent"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "src/bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+  }
+}
