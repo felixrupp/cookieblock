@@ -53,38 +53,58 @@ export default class CookieBlock {
      */
     init() {
 
+        console.log("Initial Plugin Options:");
+        console.log(this.pluginOptions);
+
         let cookieValue = this.getCookieBlockCookie();
 
         console.log("Initial Cookie Values:");
-        console.log(cookieValue);
+        console.log(this.getCookieBlockCookie());
 
         // Init the cookie values with default options
         if (cookieValue === null) {
 
             console.log("Manage DNT before Cookie:");
-            console.log(this.manageDoNotTrack());
+            let dntActive = this.manageDoNotTrack();
+            console.log(dntActive);
 
-            console.log("Default Plugin Options:");
+            console.log("Set Default Plugin Options to Cookie:");
             console.log(this.pluginOptions);
 
             this.setCookieBlockCookie(this.pluginOptions);
         }
         else {
+
             this.pluginOptions = cookieValue;
 
+            console.log("Plugin Values before DNT Manage:");
+            console.log(this.pluginOptions);
+
             console.log("Manage DNT after Cookie:");
-            console.log(this.manageDoNotTrack());
+            let dntActive = this.manageDoNotTrack();
+            console.log(dntActive);
+
+            console.log("Plugin Values after DNT Manage:");
+            console.log(this.pluginOptions);
+
+            /*
+            // Overwrite the pluginOptions with disabled values:
+            if (dntActive) {
+
+                // Block all active modules initially
+                this.pluginOptions.forEach((options, moduleId) => {
+
+                    this.manageCookie(moduleId)
+                });
+                this.setCookieBlockCookie(this.pluginOptions);
+            }
+            */
+
             this.setCookieBlockCookie(this.pluginOptions);
         }
 
-        console.log("Cookie/Plugin Values:");
+        console.log("Cookie Values:");
         console.log(this.getCookieBlockCookie());
-
-        // Block all active modules initially
-        this.pluginOptions.forEach((options, moduleId) => {
-
-            this.manageCookie(moduleId)
-        });
     }
 
     /**
@@ -170,7 +190,7 @@ export default class CookieBlock {
         moduleOptions.active = true;
 
         moduleObject.object.block();
-        this.pluginOptions.set(moduleId, moduleObject);
+        this.pluginOptions.set(moduleId, moduleOptions);
         this.setCookieBlockCookie(this.pluginOptions);
     }
 
@@ -225,7 +245,7 @@ export default class CookieBlock {
             let ie9DNT = false;
             let ie10DNT = false;
 
-            if(window.navigator.doNotTrack !== undefined && window.navigator.doNotTrack !== null) {
+            if (window.navigator.doNotTrack !== undefined && window.navigator.doNotTrack !== null) {
 
                 hasDNT = window.navigator.doNotTrack;
 
@@ -242,22 +262,23 @@ export default class CookieBlock {
 
             if (hasDNT || ie9DNT || ie10DNT) {
 
-                console.log("DNT is enabled");
-
                 // Activate all modules initially
                 this.pluginOptions.forEach((options, moduleId) => {
 
                     options.active = true;
-
-                    //this.manageCookie(moduleId)
                 });
 
+                console.log("DNT is being respected and active.");
                 return true;
             }
-
+            else {
+                console.log("DNT is being respected, but not active.");
+            }
+        }
+        else {
+            console.log("DNT is not being respected.");
         }
 
-        console.log("DNT is false");
         return false;
     }
 

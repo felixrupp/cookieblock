@@ -11,8 +11,10 @@
 
         window.cookieblock.init();
 
-        console.log();
-        console.log("Cookies afterwards:")
+        window.cookieblock.enableModule("googleAnalytics");
+        window.cookieblock.enableModule("piwik");
+
+        console.log("Final Cookie Values:");
         console.log(window.cookieblock.getCookieBlockCookie());
     </script>
 </head>
