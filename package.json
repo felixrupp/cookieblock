@@ -5,6 +5,7 @@
   "license": "MIT",
   "description": "Library to block tracking cookies, complying the eu cookie law. Combine with any cookie consent library you want.",
   "devDependencies": {
+    "yargs-parser": ">=13.1.2",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
     "babel-plugin-transform-runtime": "^6.23.0",
